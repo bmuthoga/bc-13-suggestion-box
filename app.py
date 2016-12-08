@@ -1,7 +1,7 @@
 # Importing flask module, render template which is used to render template files,
 # request to read posted values
 from flask import Flask, render_template, request, json, session, redirect, url_for, escape, abort, flash
-from datetime import datetime
+from datetime import date, datetime
 import sqlite3
 
 # Creating app using flask
@@ -27,11 +27,12 @@ def view_suggestion():
         conn = sqlite3.connect('suggestbox.db')
         mycursor = conn.cursor()
 
-        mycursor.execute ('CREATE TABLE IF NOT EXISTS suggestions(post_id BIGINT PRIMARY KEY, post_title VARCHAR, post_desc VARCHAR, date VARCHAR, flag INT, upvotes INT, downvotes INT, user_id BIGINT, FOREIGN KEY(user_id) REFERENCES users(user_id) )')
+        mycursor.execute ('CREATE TABLE IF NOT EXISTS suggestions(post_id INTEGER PRIMARY KEY AUTOINCREMENT, post_title VARCHAR NOT NULL, post_desc VARCHAR NOT NULL, date_posted VARCHAR,	flag INT DEFAULT 0, upvotes INT DEFAULT 0, downvotes INT DEFAULT 0, author VARCHAR, FOREIGN KEY(author) REFERENCES users(user_email))')
         title = request.form['title']
         content = request.form['content']
-        #date = str(datetime(year='YYYY', month='mm', day='dd'))
-        mycursor.execute ("INSERT INTO suggestions (post_title, post_desc) VALUES (?, ?)", (title, content))
+        userId = session['username']
+        today = date.today()
+        mycursor.execute ('INSERT INTO suggestions (post_title, post_desc, date_posted, author) VALUES (?, ?, ?, ?)', (title, content, today, userId))
         conn.commit()
         mycursor.close()
         conn.close()
