@@ -90,20 +90,20 @@ def signin():
 
 @app.route('/login', methods = ['GET', 'POST'])
 def login():
-   if request.method == 'POST':
-       conn = sqlite3.connect('suggestbox.db')
-       mycursor = conn.cursor()
-       mycursor.execute('SELECT * FROM users WHERE user_email = ? AND user_password = ?', (request.form['inputEmail'], request.form['inputPassword']))
-       if mycursor.fetchall():
-           session['username'] = request.form['inputEmail']
-           mycursor.close()
-           conn.close()
-           flash('Signed In')
-           return render_template('Landingpage.html')
-       else:
-           flash('Sign In Unsuccessful, Try Again')
-           return render_template('signin.html')
-   return render_template('signin.html')
+    if request.method == 'POST':
+        conn = sqlite3.connect('suggestbox.db')
+        mycursor = conn.cursor()
+        mycursor.execute('SELECT * FROM users WHERE user_email = ? AND user_password = ?', (request.form['inputEmail'], request.form['inputPassword']))
+        if mycursor.fetchall():
+            session['username'] = request.form['inputEmail']
+            mycursor.close()
+            conn.close()
+            flash('Signed In')
+            return render_template('landingpage.html')
+        else:
+            error = "Invalid credentials"
+            return render_template('signin.html')
+    return render_template('signin.html')
 
 # Define route for logout. Remove the username from the session if it is there
 @app.route('/logout')
