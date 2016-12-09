@@ -25,19 +25,23 @@ class SuggestionBoxTestCase(unittest.TestCase):
         os.close(self.db_fd)
         os.unlink(suggestionbox.app.config['DATABASE'])
 
+    # Testing for case of empty database
     def test_empty_db(self):
         rv = self.app.get('/')
         assertEqual(rv, render_template('signin.html'))
 
+    # Testing if login function works
     def login(self, username, password):
         return self.app.post('/login', data=dict(
         username=username,
         password=password
         ), follow_redirects=True)
 
+    # Testing if logout function works
     def logout(self):
         return self.app.get('/logout', follow_redirects=True)
 
+    # Testing case for correct / incorrect username and / or password
     def test_login_logout(self):
         rv = self.login('bmuthoga@gmail.com', '1234')
         assertEqual(rv, render_template('landingpage.html'))
@@ -48,6 +52,8 @@ class SuggestionBoxTestCase(unittest.TestCase):
         rv = self.login('admin', '1234')
         assertEqual(rv, render_template('signin.html'))
 
+    # Testing if Suggestion title and description are
+    # stored in database
     def test_add_suggestion(self):
         self.login('bmuthoga@gmail.com', '1234')
         rv = self.app.post('/viewSuggestion', data=dict(
