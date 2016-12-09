@@ -1,12 +1,14 @@
-# Importing flask module, render template which is used to render template files,
-# request to read posted values
-from flask import Flask, render_template, request, json, session, redirect, url_for, escape, abort, flash
-from datetime import date, datetime
+# Importing flask module, render template which
+# is used to render template files, request to read posted values.
+from flask import (Flask, render_template, request, json, session,
+                   url_for, flash)
+from datetime import date
 import sqlite3
 
-# Creating app using flask
+# Creating app using flask, setting secret key for flask to encrypt password.
 app = Flask(__name__)
 app.secret_key = "ThisIsAndela"
+
 
 # Define the basic route / and its corresponding request handler
 @app.route("/")
@@ -14,19 +16,53 @@ app.secret_key = "ThisIsAndela"
 def main():
     return render_template('index.html')
 
+
 # Define the route for submitting suggestions and rendering
 @app.route('/writeSuggestion')
 def write_suggestion():
     return render_template('writesuggestion.html')
 
-# Define the route for viewing suggestions and rendering
+
+# Define route for viewing suggestions and rendering
+@app.route('/displaySuggestions', methods=['GET', 'POST'])
+def display_suggestions():
+    print request.form
+    conn = sqlite3.connect('suggestbox.db')
+    mycursor = conn.cursor()
+    mycursor.execute('''SELECT post_title FROM suggestions
+                     ORDER BY date_posted DESC''')
+    title = list(mycursor.fetchall())
+    mycursor.execute('''SELECT post_desc FROM suggestions
+                     ORDER BY date_posted DESC''')
+    content = list(mycursor.fetchall())
+    mycursor.execute('''SELECT date_posted FROM suggestions
+                     ORDER BY date_posted DESC''')
+    date_posted = list(mycursor.fetchall())
+    mycursor.execute('''SELECT author FROM suggestions
+                     ORDER BY date_posted DESC''')
+    author = list(mycursor.fetchall())
+    mycursor.execute('''SELECT upvotes FROM suggestions
+                     ORDER BY date_posted DESC''')
+    upvotes = list(mycursor.fetchall())
+    mycursor.execute('''SELECT downvotes FROM suggestions
+                     ORDER BY date_posted DESC''')
+    downvotes = list(mycursor.fetchall())
+    mycursor.execute('''SELECT flag FROM suggestions
+                     ORDER BY date_posted DESC''')
+    flag = list(mycursor.fetchall())
+    for item in title:
+        print title, content, date_posted, author, upvotes, downvotes, flag
+    mycursor.close()
+    conn.close()
+    return render_template('viewsuggestions.html')
+
+# Define the route for posting suggestions and rendering
 @app.route('/viewSuggestion',methods=['GET', 'POST'])
 def view_suggestion():
     if request.method == "POST":
         print request.form
         conn = sqlite3.connect('suggestbox.db')
         mycursor = conn.cursor()
-
         mycursor.execute ('CREATE TABLE IF NOT EXISTS suggestions(post_id INTEGER PRIMARY KEY AUTOINCREMENT, post_title VARCHAR NOT NULL, post_desc VARCHAR NOT NULL, date_posted VARCHAR,	flag INT DEFAULT 0, upvotes INT DEFAULT 0, downvotes INT DEFAULT 0, author VARCHAR, FOREIGN KEY(author) REFERENCES users(user_email))')
         title = request.form['title']
         content = request.form['content']
@@ -43,8 +79,6 @@ def view_suggestion():
     else:
         return render_template('signIn.html')
 
-
-
 # Define the route for signup and render the signup page once the request
 # comes to the route
 @app.route("/showSignUp")
@@ -60,8 +94,10 @@ def show_landing():
         #return render_template('landingpage.html')
         conn = sqlite3.connect('suggestbox.db')
         mycursor = conn.cursor()
-
-        mycursor.execute ('CREATE TABLE IF NOT EXISTS users(user_id BIGINT PRIMARY KEY, user_name VARCHAR, user_email VARCHAR UNIQUE, user_username VARCHAR UNIQUE, user_password VARCHAR) ')
+        mycursor.execute ('''CREATE TABLE IF NOT EXISTS
+                          users(user_id BIGINT PRIMARY KEY, user_name VARCHAR,
+                          user_email VARCHAR UNIQUE, user_username VARCHAR UNIQUE,
+                          user_password VARCHAR) ''')
         inputName = request.form['inputName']
         inputEmail = request.form['inputEmail']
         inputUsername = request.form['inputUsername']
@@ -77,18 +113,16 @@ def show_landing():
         username = session['username']
         return render_template('Landingpage.html')
         return flash("Signed In")
-        #return 'Logged in as ' + username + '<br>' + \
-        #"<b><a href = '/logout'>click here to log out</a></b>"
     else:
         return render_template('signIn.html')
 
-
-# Define the route for signin and render the signup page once the request
+# Define the route for signin and render the signin page once the request
 # comes to the route
 @app.route("/showSignIn")
 def signin():
     return render_template('signin.html')
 
+# Define the route for login and render landingpage after successful login
 @app.route('/login', methods = ['GET', 'POST'])
 def login():
     if request.method == 'POST':

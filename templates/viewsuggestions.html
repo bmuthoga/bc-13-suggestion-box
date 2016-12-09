@@ -4,28 +4,29 @@
   <title>Suggestion Box</title>
   <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="http://getbootstrap.com/examples/jumbotron-narrow/jumbotron-narrow.css" rel="stylesheet">
+  <link href="../static/js/signup.css" rel="stylesheet">
 </head>
 <body>
   <div class="container">
     <div class="header">
       <nav>
         <ul class="nav nav-pills pull-right">
-          <li role="presentation" class="active"><a href="#">Welcome</a>
-          </li>
+          <li role="presentation" ><a href="showLanding">Back</a></li>
+          <li role="presentation" class="active"><a href="#">Viewing Suggestions</a></li>
         </ul>
       </nav>
       <h3 class="text-muted"><a href="http://www.andela.com"><img src="../static/img/logo3.png"/></a>bc-13 Suggestion Box</h3>
     </div>
     <div class="jumbotron">
-      <h1>Suggestion Box</h1>
-      <p class="lead"></p>
-      <p><a class="btn btn-lg btn-success" href="showSignUp" role="button" style="background-color: #337ab7">Sign Up</a>
-        <p><a class="btn btn-lg btn-success" href="showSignIn" role="button" style="background-color: #337ab7">Sign In</a>
-        </p>
-      </div>
-      <footer class="footer">
-        <p>Suggestion Box &copy; 2016</p>
-      </footer>
+      <panel>
+        <h3>Recent Suggestions</h3>
+      </panel>
+      <form class="form-signin" action="{{ url_for('display_suggestions') }}" method="post">
+      </form>
     </div>
-  </body>
-  </html>
+    <footer class="footer">
+      <p>Suggestion Box &copy; 2016</p>
+    </footer>    
+  </div>
+</body>
+</html>
